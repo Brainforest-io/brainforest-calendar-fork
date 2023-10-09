@@ -18,6 +18,25 @@ class DayColumn extends React.Component {
   state = { selecting: false, timeIndicatorPosition: null }
   intervalTriggered = false
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.selectable && !prevState?.selectable) {
+      if (this && this._selectable) {
+        this._selectable()
+      }
+    }
+
+    if (!nextProps.selectable && prevState?.selectable) {
+      this._teardownSelectable()
+    }
+
+    const updatedSlotMetrics = prevState?.slotMetrics?.update(nextProps)
+
+    return {
+      selectable: nextProps.selectable,
+      slotMetrics: updatedSlotMetrics,
+    }
+  }
+
   constructor(...args) {
     super(...args)
 
@@ -28,22 +47,12 @@ class DayColumn extends React.Component {
   componentDidMount() {
     this.props.selectable && this._selectable()
 
-    if (this.props.isNow) {
-      this.setTimeIndicatorPositionUpdateInterval()
-    }
+    this.setTimeIndicatorPositionUpdateInterval()
   }
 
   componentWillUnmount() {
     this._teardownSelectable()
     this.clearTimeIndicatorInterval()
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.selectable && !this.props.selectable) this._selectable()
-    if (!nextProps.selectable && this.props.selectable)
-      this._teardownSelectable()
-
-    this.slotMetrics = this.slotMetrics.update(nextProps)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -92,16 +101,21 @@ class DayColumn extends React.Component {
   }
 
   positionTimeIndicator() {
-    const { min, max, getNow } = this.props
+    const { getNow } = this.props
     const current = getNow()
 
-    if (current >= min && current <= max) {
-      const top = this.slotMetrics.getCurrentTimePosition(current)
-      this.intervalTriggered = true
-      this.setState({ timeIndicatorPosition: top })
-    } else {
-      this.clearTimeIndicatorInterval()
-    }
+    // ? Custom improvement
+    const top = this.slotMetrics.getCurrentTimePosition(current)
+    this.intervalTriggered = true
+    this.setState({ timeIndicatorPosition: top })
+    // ! Original code. Please don't remove
+    // if (current >= min && current <= max) {
+    //   const top = this.slotMetrics.getCurrentTimePosition(current)
+    //   this.intervalTriggered = true
+    //   this.setState({ timeIndicatorPosition: top })
+    // } else {
+    //   this.clearTimeIndicatorInterval()
+    // }
   }
 
   render() {
@@ -173,12 +187,13 @@ class DayColumn extends React.Component {
             <span>{localizer.format(selectDates, 'selectRangeFormat')}</span>
           </div>
         )}
-        {isNow && this.intervalTriggered && (
+        {/* // ! Modified code  */}
+        {
           <div
             className="rbc-current-time-indicator"
             style={{ top: `${this.state.timeIndicatorPosition}%` }}
           />
-        )}
+        }
       </DayColumnWrapperComponent>
     )
   }

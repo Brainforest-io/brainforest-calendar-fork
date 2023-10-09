@@ -39,3 +39,10 @@ node_modules
 .yarn
 # Yarn NodeLinker
 .yarnrc.yml
+
+# Storybook
+storybook-static
+
+yarn.lock
+
+package-lock.json
