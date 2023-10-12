@@ -1,10 +1,10 @@
 {
-  "name": "react-big-calendar",
-  "version": "1.8.4",
-  "description": "Calendar! with events",
+  "name": "react-big-calendar-v2",
+  "version": "1.8.5",
+  "description": "Calendar! with events + Week time indicator",
   "author": {
-    "name": "Jason Quense",
-    "email": "monastic.panic@gmail.com"
+    "name": "Stan Kolkovsky",
+    "email": "stas.kolkovsky@gmail.com"
   },
   "repository": {
     "type": "git",
